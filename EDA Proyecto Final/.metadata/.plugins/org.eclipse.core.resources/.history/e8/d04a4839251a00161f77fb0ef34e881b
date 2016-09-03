@@ -1,0 +1,80 @@
+/*
+ * MeshReader_List.c
+ *
+ *  Created on: 14/05/2016
+ *      Author: Mariana
+ *
+ *      Modificación 14 de marzo
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "List.h"
+
+struct coordenadas {
+	float x; //punto para el eje x
+	float y; //punto para el eje y
+	float z; //punto para el eje z
+};
+
+struct tri {
+	int p1; //indice de la coordenada del primer punto
+	int p2; //indice de la coordenada del segundo punto
+	int p3; //indice de la coordenada del tercer punto.
+};
+
+typedef struct coordenadas* COORD;
+typedef struct tri* Triangle;
+
+struct malla {
+	int nVert; //cantidad de vertices que hay en el mesh
+	int nFaces; //cantidad de triangulos que hay en el mesh
+	List Lista_Triangulos; //lista de triangulo
+	List Lista_Coordenadas;//lista de coordenadas
+};
+
+typedef struct malla* Mesh;
+
+Mesh crear_Mesh (){ //crear el Mesh y crear la lista
+	Mesh m = (Mesh) malloc (sizeof(struct malla));
+	list_create(m->Lista_Coordenadas);
+	list_create(m->Lista_Triangulos);
+	m->nVert = 0;
+	m->nFaces = 0;
+	return m;
+};
+
+void open_Mesh(char * filename, Mesh m_malla){
+	FILE * archivoMesh = fopen(filename, "rt");
+	if (archivoMesh == NULL){
+		printf("El archivo no se pudo abrir\n");
+		return;
+	} else{
+		printf("El archivo sí se puede abrir\n");
+		fscanf(archivoMesh, "ply\nformat ascii\n");
+		fscanf(archivoMesh, "element vertex");
+		fscanf(archivoMesh, " %d\n", &m_malla->nVert);
+		fscanf(archivoMesh, "property float x\n");
+		fscanf(archivoMesh, "property float y\n");
+		fscanf(archivoMesh, "property float z\n");
+		fscanf(archivoMesh, "element face");
+		fscanf(archivoMesh, " %d\n", &m_malla->nFaces);
+		fscanf(archivoMesh, "property list uchar char vertex_indices\n");
+		fscanf(archivoMesh, "end_header\n");
+
+		int i = 0;
+		COORD Coordenadas = NULL;
+		for ( i = 0; i < m_malla->nVert; i++){
+			fscanf(archivoMesh, "%f %f %f\n", &Coordenadas->x, &Coordenadas->y, &Coordenadas->z);
+
+		}
+	}
+	return;
+}
+
+int main (){
+	setbuf(stdout, NULL);
+	Mesh m_malla = crear_Mesh;
+
+	return 0;
+}

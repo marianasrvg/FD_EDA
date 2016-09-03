@@ -1,0 +1,121 @@
+/*
+ * MeshReader_List.c
+ *
+ *  Created on: 14/05/2016
+ *      Author: Mariana
+ *
+ *      Modificación 14 de marzo
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef enum {FALSE, TRUE} Bool;
+
+struct coordenadas {
+	float x; //punto para el eje x
+	float y; //punto para el eje y
+	float z; //punto para el eje z
+	struct coordenadas * next;
+};
+
+struct tri {
+	int p1; //indice de la coordenada del primer punto
+	int p2; //indice de la coordenada del segundo punto
+	int p3; //indice de la coordenada del tercer punto.
+	struct tri * next;
+};
+
+typedef struct coordenadas* COORD;
+typedef struct tri* Triangle;
+
+struct  list_tri{ //Lista de triangulos
+	Triangle first, last;
+	int list_Size;
+};
+
+struct list_coord{ //Lista de coordenadas
+	COORD first, last;
+	int list_Size;
+};
+
+typedef struct list_tri *ListaTri;
+typedef struct list_coord *ListaCoord;
+
+struct malla {
+	int nVert; //cantidad de vertices que hay en el mesh
+	int nFaces; //cantidad de triangulos que hay en el mesh
+	ListaTri Lista_Triangulos; //lista de triangulo
+	ListaCoord Lista_Coordenadas;//lista de coordenadas
+};
+
+typedef struct malla* Mesh;
+
+//Función para leer el archivo
+void open_Mesh(char *filename, Mesh m_malla) {
+	//Creación de la malla que utilizaremos en el programa
+	FILE *archivoMesh = fopen(filename, "rt"); //creación del archivo y lectura
+	if (archivoMesh == NULL) {
+		printf("El archivo no se puede abrir\n");
+		return;
+	}
+	//Reading header
+	printf("El archivo sí se pudo abrir\n");
+	fscanf(archivoMesh, "ply\nformat asciis\n");
+	printf("(:\n");
+	fscanf(archivoMesh, "element vertex");
+	fscanf(archivoMesh, " %d\n", &m_malla->nVert);
+//	fscanf(archivoMesh, "element vertex %d\n", &v); //obtener el número de vertices
+//	m_malla->nVert = v;
+//	fscanf(archivoMesh, "element vertex 6\n");
+	printf(":O\n");
+	fscanf(archivoMesh, "property float x\n");
+	fscanf(archivoMesh, "property float y\n");
+	fscanf(archivoMesh, "property float z\n");
+	printf(":D\n");
+//	fscanf(archivoMesh, "element face %d\n", &m_malla->nFaces); //obtener número de triángulos
+	fscanf(archivoMesh, "element face");
+	fscanf(archivoMesh, " %d\n", &m_malla->nFaces);
+	fscanf(archivoMesh, "property list uchar char vertex_indices\n");
+	fscanf(archivoMesh, "end_header\n");
+
+	//ciclo para obtener vértices
+	int i = 0;
+	printf("HOLI\n");
+	m_malla->arrayCord = malloc(m_malla->nVert * sizeof(COORD)); //creamos el arreglo del tamaño obtenido
+	printf("OMG\n");
+	for (i = 0; i < m_malla->nVert; i++) {
+		fscanf(archivoMesh, "%f %f %f\n", &m_malla->arrayCord[i]->x,
+				&m_malla->arrayCord[i]->y, &m_malla->arrayCord[i]->z);
+		//		m_malla.arrayCord++;
+	}
+
+	//imprimir a ver sí funciona
+/*	for (i = 0; i < m_malla.nVert; i++) {
+		printf("%f %f %f\n", m_malla.arrayCord[i].x, m_malla.arrayCord[i].y,
+				m_malla.arrayCord[i].z);
+	}
+*/
+	//ciclo para obtener triángulos
+	m_malla->arrayTri = malloc(m_malla->nFaces * sizeof(Triangle));
+	printf("OMG\n");
+	for (i = 0; i < m_malla->nFaces; i++) {
+		//fscanf(archivoMesh, "3 %d %d %d\n", &m_malla->arrayTri[i]->p1,
+		//		&m_malla->arrayTri[i]->p2, &m_malla->arrayTri[i]->p3);
+		//	(m_malla.arrayTri)++;
+		fscanf(archivoMesh, "3");
+		fscanf(archivoMesh, " %d %d %d\n", &m_malla->arrayTri[i]->p1, &m_malla->arrayTri[i]->p2, &m_malla->arrayTri[i]->p3);
+	}
+	printf("IT WORKS");
+	//imprimir a ver sí funciona
+	/*for (i = 0; i < m_malla.nFaces; i++) {
+		printf("%d %d %d\n", m_malla.arrayTri[i].p1, m_malla.arrayTri[i].p2,
+				m_malla.arrayTri[i].p3);
+	}*/
+
+	//printf("Número de vertices = %d\n", m_malla.nVert);
+	//printf("Número de triángulos = %d\n", m_malla.nFaces);
+	fclose(archivoMesh);
+	return;
+}
+
