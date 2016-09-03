@@ -1,0 +1,190 @@
+/*
+ * Archivo_elementos.c
+ *
+ *  Created on: 23/11/2015
+ *      Author: DavidAlejandro
+ */
+
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+#define FILAS 20
+#define COLUMNAS 20
+#define TAM 11
+
+void imprimir_tablero(char tablero[FILAS][COLUMNAS]){
+
+	int i, x;
+	printf("\n\t TABLERO \n");
+	for (i = 0; i < FILAS; i ++){
+		for ( x = 0; x < COLUMNAS; x++){
+			if ( tablero[i][x] < 123 && tablero[i][x] > 96){
+			printf("|%c", tablero[i][x]);
+			} else
+			printf("| ");
+		}
+		printf("|");
+		printf("\n");
+		for (x = 0; x < COLUMNAS;x++){
+			printf("__");
+		}
+		printf("\n");
+	}
+
+	return;
+}
+
+void imprimir_mano(char *mano){
+	int i=0;
+
+	printf("\n\n\t TUS LETRAS PARA JUGAR SON:\n\n");
+	for (i = 0; i < TAM; i++){
+		if (mano[i] < 123 && mano[i] > 96){
+			printf("| %c ", mano[i]);
+		} else{
+			printf("|   ");
+		}
+	}
+	printf("|\n");
+	return;
+}
+
+void dar_mano(char *mano){
+	int i = 0;
+
+	for(i=0; i<=TAM; i++){
+		if(mano[i] == '\0'){
+			mano[i] = ((rand()%25)+1)+97;
+		}
+	}
+	return;
+}
+
+/*int checar_palabra(char *elemento){
+	//FILE *archivo = ("elementos.txt", "rt");
+	int fov = 0;
+
+	if (archivo == NULL) {
+		printf("VOY A EXPLOTAR, cierrame YA!");
+		return fov;
+	}
+	return fov;
+}
+*/
+
+int contar_letras(char *elemento){
+	int i;
+	for(i = 0; elemento[i] != '\0'; i++);
+	return i;
+}
+
+int horizontal(char *elemento, int x, int y){
+	int tof = 0;
+	int cantidad = contar_letras(elemento);
+
+
+	if ((FILAS - x) < cantidad){
+		tof = 0;
+
+	} else {
+		tof = 1;
+	}
+	return tof;
+}
+
+int vertical(char *elemento, int x, int y){
+	int tof = 0;
+	int cantidad = contar_letras(elemento);
+
+	if ((COLUMNAS - y) < cantidad){
+		tof = 0;
+	} else {
+		tof = 1;
+	}
+	return tof;
+}
+
+int revisar_tablero(char *elemento, int x, int y, int hv){
+	int fov = 0;
+	if (hv == 1){
+		//HORIZONTAL
+		fov = horizontal(elemento, x, y);
+	} else if (hv == 2){
+		fov = vertical(elemento, x, y);
+		//VERTICAL
+	} else {
+		printf("No te doy permiso:D\n");
+		return fov;
+	}
+
+	return fov;
+}
+
+int main (){
+
+	setvbuf (stdout, NULL, _IONBF, 0);
+
+	srand(time(NULL));
+
+	char tablero[FILAS][COLUMNAS] = {'\0'};
+	char mano_j1[TAM] = {'\0'};
+	char elemento[12];
+	int menu = 0;
+	int i = 0;
+
+	dar_mano(mano_j1);
+
+
+	do {
+		imprimir_tablero(tablero);
+		imprimir_mano(mano_j1);
+		fflush(stdin);
+
+		printf("\n¿Que quieres hacer?\n");
+		printf("1.Cambiar mano\n");
+		printf("2.Escribir en el tablero\n");
+		printf("0.SALIR\nEscribe la opción que necesitas realizar:\t");
+		scanf("%d", &menu);
+
+		switch(menu){
+		case 1:
+			for (i = 0; i <= TAM; i++){
+				mano_j1[i] = '\0';
+			}
+			dar_mano(mano_j1);
+			break;
+		case 2:
+			printf("\n ¿Que palabra quieres ingresar?:\t");
+			gets(elemento);
+			int x, y, hv, resultado;
+			do{
+				printf(" Ingresa la coordenada en FILAS |:\t");
+				scanf("%d", &x);
+			} while (x > 20);
+			do{
+				printf(" Ingresa la coordenada en COLUMNAS --:\t");
+				scanf("%d", &y);
+			} while (y > 20);
+			printf("Ingresa 1 si quieres la palabra en HORIZONTAL\nIngresa 2 si quieres la palabra en VERTICAL\n:");
+			scanf("%d", &hv);
+			resultado = revisar_tablero(elemento, x, y, hv);
+			if (resultado == 0){
+				printf("No puedes poner esa palabra darling:3");
+			} else {
+				//ESCRIBIR PALABRA EN TABLERO
+				//CONTAR PUNTOS
+			}
+			break;
+		case 0:
+			return 0;
+			break;
+		default:
+			break;
+		}
+	} while (menu != 0);
+
+	return 0;
+}
+
+
